@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 const port = 8080;
 const path = require("path");
+const { v4 : uuidv4 } = require('uuid');
 
 app.use(express.urlencoded({extended:true}));
 
@@ -12,18 +13,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 let posts = [
     {
-        id : "1a",
+        id : uuidv4(),
         username: "ri5ing",
         content: "i love coding"
     },
     {
-         id : "2b",
+         id :  uuidv4(),
         username: "user1",
         content: "i am moneymagnet"
-        
     },
-       {
-         id : "3c",
+    {
+         id : uuidv4(),
         username: "user2",
         content: "consistency"
     },
@@ -39,7 +39,10 @@ app.get("/posts/new",(req,res)=>{
 
 app.post("/posts",(req,res)=>{
     let { username,content}=req.body;
-    posts.push({ username , content });
+    
+    let id = uuidv4(); 
+    posts.push({ id, username , content }); 
+    
     res.redirect("/posts");
 });
 
@@ -47,6 +50,10 @@ app.get("/posts/:id", (req, res) => {
     let { id } = req.params;
     let post = posts.find((p) => id === p.id);
     
+    if (!post) {
+        return res.status(404).send("Post not found");
+    }
+
     res.render("show.ejs", { post }); 
 });
 
